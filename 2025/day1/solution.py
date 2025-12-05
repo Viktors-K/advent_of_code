@@ -46,12 +46,12 @@ print(f"The safe code points at 0 a total of {zeroes} times. (part 1)")
 # resets starting variables
 position = 50
 zeroes = 0
-verbose = True
+verbose = False
 
-if verbose:
-    print(f"The dial starts by pointing at {position}.")
-for action in test:
+if verbose: print(f"The dial starts by pointing at {position}.")
+for action in inputs:
     turnedThroughZero = 0
+    turnNormalized = 0
     if action[0] == 'R':
         # if turning right, we add
         coefficient = 1
@@ -61,6 +61,13 @@ for action in test:
     # vector of action
     turn = coefficient * int(action[1:])
     
+    # if out of bounds, normalize abs value of rotation to be under 100
+    while turn > 99:
+        turn -= 100
+        turnNormalized += 1
+    while turn < -99:
+        turn += 100
+        turnNormalized += 1
     # save oldpos for buffer and get newpos
     oldposition = position
     position += turn
@@ -73,22 +80,17 @@ for action in test:
             turnedThroughZero += 1
     while position < 0:
         position += 100
-        if position != 0 and oldposition != 0 and turn<-100:
+        if oldposition != 0:
             turnedThroughZero += 1
     # after every turn, we check if we are at 0
     if position == 0:
         zeroes+=1
-        if verbose:
-            print(f"The dial is rotated {action} to point at {position}!!!",end='')
-    else:
-        if verbose:
-            print(f"The dial is rotated {action} to point at {position}.",end='')
     zeroes += turnedThroughZero
-    if turnedThroughZero > 0:
-        if verbose:
-            print(f" During this rotation, it points at zero {turnedThroughZero} times.")
+    zeroes += turnNormalized
+    if verbose: print(f"The dial is rotated {action} to point at {position}.",end='')
+    if turnedThroughZero > 0 or turnNormalized > 0:
+        if verbose: print(f" During this rotation, it points at zero {turnedThroughZero}+{turnNormalized}={turnedThroughZero+turnNormalized} times. ")
     else:
-        if verbose:
-            print(f"")
+        if verbose: print(f"")
 
-print(f"The safe code points at 0 a total of {zeroes} times. (part 2.2)")
+print(f"The safe code points at 0 a total of {zeroes} times. (part 2)")
